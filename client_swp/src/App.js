@@ -1,4 +1,5 @@
 import React from 'react';
+import ProductsPage from './pages/ProductPage';
 import TruckVisualizer from './components/truckVisualizer';
 import TruckPlot from './components/truckPlot';
 import PlotComponent from './components/plotComponent';
@@ -6,12 +7,13 @@ import PlotComponent from './components/plotComponent';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Truck Packing Visualization</h1>
+      {/* <header className="App-header"> */}
+        {/* <h1>Truck Packing Visualization</h1> */}
         {/* <TruckVisualizer /> */}
-        <PlotComponent />
+        {/* <PlotComponent /> */}
         {/* <TruckPlot /> */}
-      </header>
+      {/* </header> */}
+      <ProductsPage />
     </div>
   );
 }
