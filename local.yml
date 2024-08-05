@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: swp_django
+    container_name: swp_django
+    command: /start.sh
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env/.local/.django
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: swp_postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=swp_hub
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwertyuiopasdfghjklzxcvbnm
+
+  redis:
+    image: redis:7-alpine
+    container_name: swp_redis
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: swp_celery_worker
+    container_name: swp_celery_worker
+    command: /start-celeryworker.sh
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.local/.celery
+    depends_on:
+      - redis
+      - db
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: swp_celery_beat
+    container_name: swp_celery_beat
+    command: /start-celerybeat.sh
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.local/.beat
+    depends_on:
+      - redis
+      - db
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: swp_celery_flower
+    container_name: swp_flower
+    command: /start-flower.sh
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env/.local/.flower
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+  webpack:
+    build:
+      context: .
+      dockerfile: ./compose/local/webpack/Dockerfile
+    image: swp_webpack
+    container_name: swp_webpack
+    command: /start-webpack.sh
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    environment:
+      - NODE_ENV=development
+
+volumes:
+  postgres_data:
