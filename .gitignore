@@ -11,7 +11,7 @@ yarn-error.log*
 .pnp.js
 
 # dotenv environment variables file
-.env
+
 
 # Logs
 logs
@@ -31,7 +31,7 @@ __pycache__/
 
 # Environments
 .venv/
-env/
+
 menv/
 venv/
 .menv/

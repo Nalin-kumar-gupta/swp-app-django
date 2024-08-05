@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import environ
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-eya8qcjbbdjf!xdlzm_y3ap^zx9l-hejj1@q0l6zkpgb7p%9cj'
+# SECRET_KEY = 'django-insecure-eya8qcjbbdjf!xdlzm_y3ap^zx9l-hejj1@q0l6zkpgb7p%9cj'
+
+env = environ.Env(DEBUG=(bool, False))
+
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env/.local/.django"))
+
+DEBUG = env("DEBUG")
+
+SECRET_KEY = env("SECRET_KEY")
+
+
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+
+REDIS_URL = env("REDIS_URL")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -39,6 +57,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api_shipper',
+    "corsheaders",
+    "django_celery_results",
+    "django_celery_beat",
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
@@ -77,13 +99,13 @@ WSGI_APPLICATION = 'server_swp.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {"default": env.db("DATABASE_URL")}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -116,6 +138,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+WSGI_APPLICATION = "server_swp.wsgi.application"
+
+CELERY_BROKER_URL = env("BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

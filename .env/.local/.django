@@ -1,0 +1,17 @@
+SECRET_KEY="django-insecure-eya8qcjbbdjf!xdlzm_y3ap^zx9l-hejj1@q0l6zkpgb7p%9cj"
+DEBUG=1
+DJANGO_ALLOWED_HOSTS="*"
+DATABASE_URL="postgres://postgres:qwertyuiopasdfghjklzxcvbnm@db:5432/swp_hub"
+REDIS_URL="redis://redis:6379"
+BROKER_URL="redis://redis:6379/0"
+CELERY_RESULT_BACKEND="redis://redis:6379/0"
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+SQL_ENGINE="django.db.backends.postgresql"
+SQL_DATABASE="swp_hub"
+SQL_USER="postgres"
+SQL_PASSWORD="qwertyuiopasdfghjklzxcvbnm"
+SQL_HOST="db"
+SQL_PORT="5432"
