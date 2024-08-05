@@ -24,8 +24,6 @@ COPY ./compose/local/webpack/start.sh /start-webpack.sh
 RUN sed -i 's/\r$//g' /start-webpack.sh
 RUN chmod +x /start-webpack.sh
 
-# Run the build process
-RUN npm run build
 
 EXPOSE 3000
 

@@ -57,6 +57,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api_shipper',
+    "corsheaders",
+    "django_celery_results",
+    "django_celery_beat",
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
