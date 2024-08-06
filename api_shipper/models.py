@@ -7,6 +7,7 @@ import uuid
 class Truck(models.Model):
     # Unique identifier for each truck
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    model_name = models.CharField(max_length=20, unique=True) 
     
     # Dimensions of the truck in meters
     length = models.DecimalField(max_digits=6, decimal_places=2)
@@ -42,7 +43,8 @@ class Truck(models.Model):
 class Package(models.Model):
     # Unique identifier for each package using UUID
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
+
+    name = models.CharField(max_length=20, unique=True) 
     # Dimensions of the package in meters (using DecimalField for more precision)
     length = models.DecimalField(max_digits=5, decimal_places=2)
     breadth = models.DecimalField(max_digits=5, decimal_places=2)
