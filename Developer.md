@@ -13,3 +13,6 @@ docker-compose -f local.yml run web python manage.py createsuperuser
 
 # Package CRUD API URL
 http://localhost:8000/api/packages
+
+# create data
+docker-compose -f local.yml run web python manage.py populate_inventory
