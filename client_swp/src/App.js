@@ -3,6 +3,8 @@ import ProductsPage from './pages/ProductPage';
 import TruckVisualizer from './components/truckVisualizer';
 import TruckPlot from './components/truckPlot';
 import PlotComponent from './components/plotComponent';
+import Button from '@mui/material/Button';
+import ResponsiveAppBar from './components/appBar';
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         {/* <PlotComponent /> */}
         {/* <TruckPlot /> */}
       {/* </header> */}
+      {/* <Button variant='contained'>Hello</Button> */}
+      <ResponsiveAppBar />
       <ProductsPage />
     </div>
   );
