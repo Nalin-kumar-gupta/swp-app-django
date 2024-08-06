@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from api_shipper.models import Trailer, Package
+from api_shipper.models import Truck, Package
 
 class Command(BaseCommand):
     help = 'Populate the database with hardcoded Truck and Box data'
@@ -17,7 +17,7 @@ class Command(BaseCommand):
             'wheel_load_capacity': 2000,
         }
         
-        truck, created = Trailer.objects.get_or_create(**truck_data)
+        truck, created = Truck.objects.get_or_create(**truck_data)
         if created:
             self.stdout.write(self.style.SUCCESS(f'Truck created: {truck}'))
         else:
@@ -25,21 +25,21 @@ class Command(BaseCommand):
         
         # Create Boxes
         boxes_data = [
-            {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'priority': 1},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 3, 'breadth': 3, 'height': 3, 'weight': 900, 'priority': 2},
-            {'length': 1, 'breadth': 2, 'height': 1, 'weight': 200, 'priority': 4},
-            {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'priority': 1},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 3, 'breadth': 3, 'height': 3, 'weight': 900, 'priority': 2},
-            {'length': 1, 'breadth': 2, 'height': 1, 'weight': 200, 'priority': 4},
-            {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'priority': 1},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
-            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 200, 'priority': 3},
-            {'length': 2, 'breadth': 1, 'height': 1, 'weight': 200, 'priority': 3}
+            {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500},
+            {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100},
+            {'length': 3, 'breadth': 3, 'height': 3, 'weight': 900},
+            # {'length': 1, 'breadth': 2, 'height': 1, 'weight': 200, 'priority': 4},
+            # {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'priority': 1},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
+            # {'length': 3, 'breadth': 3, 'height': 3, 'weight': 900, 'priority': 2},
+            # {'length': 1, 'breadth': 2, 'height': 1, 'weight': 200, 'priority': 4},
+            # {'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'priority': 1},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 100, 'priority': 3},
+            # {'length': 1, 'breadth': 1, 'height': 1, 'weight': 200, 'priority': 3},
+            # {'length': 2, 'breadth': 1, 'height': 1, 'weight': 200, 'priority': 3}
         ]
         
         for box_data in boxes_data:

@@ -29,7 +29,7 @@ contourpy==1.2.1
 coverage==7.5.1
 cron-descriptor==1.4.3
 cycler==0.12.1
-debugpy==1.8.3
+debugpy
 decorator==5.1.1
 defusedxml==0.7.1
 distlib==0.3.8

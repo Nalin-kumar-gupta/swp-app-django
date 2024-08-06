@@ -10,3 +10,6 @@ docker-compose -f local.yml run web python manage.py migrate
 
 # create super user
 docker-compose -f local.yml run web python manage.py createsuperuser
+
+# Package CRUD API URL
+http://localhost:8000/api/packages
