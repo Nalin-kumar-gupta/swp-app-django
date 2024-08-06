@@ -28,7 +28,13 @@ class Truck(models.Model):
         ('loaded', 'Allocated Packages'),
         ('dispatched', 'Dispatched')
     ]
+    destination = models.CharField(max_length=50)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inventory', editable=False)
+
+    def save(self, *args, **kwargs):
+        if self.destination:
+            self.destination = self.destination.upper()
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"Truck {self.id} - GVWR: {self.gvwr} kg"
@@ -52,17 +58,22 @@ class Package(models.Model):
         ('dispatched', 'Dispatched')
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inventory', editable=False)
+    destination = models.CharField(max_length=50)
+    deliver_date = models.DateField()
 
     allocation = models.ForeignKey(Truck, default=None, null=True, blank=True, on_delete=models.SET_NULL, editable=False)
 
     @property
     def volume(self):
         return self.length * self.breadth * self.height
-    
-    @property
-    def priority(self):
-        # TODO
-        return 2
+
+
+    def save(self, *args, **kwargs):
+        if self.destination:
+            self.destination = self.destination.upper()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Package {self.id} - Volume: {self.volume} m³ - Status: {self.get_status_display()} - Truck: {self.allocation_id}"
+        return f"Package {self.id} - Volume: {self.volume} m³"
+
+
