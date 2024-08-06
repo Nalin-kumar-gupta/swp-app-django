@@ -66,6 +66,11 @@ class Package(models.Model):
     @property
     def volume(self):
         return self.length * self.breadth * self.height
+    
+    @property
+    def priority(self):
+        # TODO
+        return ""
 
 
     def save(self, *args, **kwargs):
