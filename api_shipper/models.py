@@ -1,79 +1,68 @@
 from django.db import models
-
-from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 import uuid
 
 
 
-class Package(models.Model):
-    # Unique identifier for each box using UUID
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Dimensions of the box in meters
-    length = models.IntegerField()
-    breadth = models.IntegerField()
-    height = models.IntegerField()
-    
-    # Weight in kilograms
-    weight = models.IntegerField()
-    
-    # Priority of the box (e.g., delivery priority)
-    priority = models.IntegerField()
-
-    @property
-    def volume(self):
-        return self.length * self.breadth * self.height
-
-
-    def __str__(self):
-        return f"Package {self.id} - Volume: {self.volume} m³"
-
-
-
-class Trailer(models.Model):
+class Truck(models.Model):
     # Unique identifier for each truck
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
     # Dimensions of the truck in meters
-    length = models.IntegerField()
-    breadth = models.IntegerField()
-    height = models.IntegerField()
+    length = models.DecimalField(max_digits=6, decimal_places=2)
+    breadth = models.DecimalField(max_digits=6, decimal_places=2)
+    height = models.DecimalField(max_digits=6, decimal_places=2)
     
     # Weight metrics in kilograms
-    tare_weight = models.IntegerField()
-    gvwr = models.IntegerField()  # Gross Vehicle Weight Rating
+    tare_weight = models.DecimalField(max_digits=10, decimal_places=2)
+    gvwr = models.DecimalField(max_digits=10, decimal_places=2)  # Gross Vehicle Weight Rating
     
-    # Axle weight ratings in kilograms
-    axle_weight_ratings = models.JSONField()  # Example: [4000, 4000]
-    axle_group_weight_ratings = models.JSONField()  # Example: [6000]
+    # Axle weight ratings in kilograms (JSONField for flexibility)
+    axle_weight_ratings = models.JSONField()  # Example: [4000.0, 4000.0]
+    axle_group_weight_ratings = models.JSONField()  # Example: [6000.0]
 
-    wheel_load_capacity = models.DecimalField(max_digits=7, decimal_places=2)
-    
-    # Truck status and additional information
-    occupied = models.JSONField(default=list)  # e.g., [True, False, True]
-    current_weight = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    center_of_gravity = models.JSONField(default=[0, 0, 0])  # Example: [x, y, z]
+    wheel_load_capacity = models.DecimalField(max_digits=10, decimal_places=2)
 
-    @property
-    def cargo_capacity(self):
-        return self.gvwr - self.current_weight
-    
-    @property
-    def space(self):
-        # This might be better represented using actual spatial management or more complex structures
-        return {'length': self.length, 'breadth': self.breadth, 'height': self.height}
-    
-    @property
-    def weight_distribution(self):
-        # Assuming weight distribution involves more than a simple zero matrix, this is an example
-        return {'length': self.length, 'breadth': self.breadth, 'height': self.height}
-
-    @property
-    def axle_loads(self):
-        return [0] * len(self.axle_weight_ratings)
-
+    STATUS_CHOICES = [
+        ('entered', 'Entered the Inventory'),
+        ('loaded', 'Allocated Packages'),
+        ('dispatched', 'Dispatched')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inventory', editable=False)
     
     def __str__(self):
-        return f"Trailer {self.id} - GVWR: {self.gvwr} kg"
+        return f"Truck {self.id} - GVWR: {self.gvwr} kg"
+    
+class Package(models.Model):
+    # Unique identifier for each package using UUID
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    
+    # Dimensions of the package in meters (using DecimalField for more precision)
+    length = models.DecimalField(max_digits=5, decimal_places=2)
+    breadth = models.DecimalField(max_digits=5, decimal_places=2)
+    height = models.DecimalField(max_digits=5, decimal_places=2)
+    
+    # Weight in kilograms (using DecimalField for precision)
+    weight = models.DecimalField(max_digits=6, decimal_places=2)
+    
+    # Status of the package
+    STATUS_CHOICES = [
+        ('inventory', 'Inventory'),
+        ('allocated', 'Allocated to Truck'),
+        ('dispatched', 'Dispatched')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inventory', editable=False)
+
+    allocation = models.ForeignKey(Truck, default=None, null=True, blank=True, on_delete=models.SET_NULL, editable=False)
+
+    @property
+    def volume(self):
+        return self.length * self.breadth * self.height
+    
+    @property
+    def priority(self):
+        # TODO
+        return 2
+
+    def __str__(self):
+        return f"Package {self.id} - Volume: {self.volume} m³ - Status: {self.get_status_display()} - Truck: {self.allocation_id}"
