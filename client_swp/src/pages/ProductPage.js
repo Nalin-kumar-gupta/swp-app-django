@@ -6,6 +6,7 @@ import * as XLSX from "xlsx";
 import CustomizedTables from "../components/productTable";
 import ProductForm from "../components/productForm";
 import VehicleModal from "../components/vehicleModal";
+import productApi from "../utils/webApi/productApi";
 
 const ProductsPage = () => {
   //   const [data, setData] = useState([]);
@@ -196,6 +197,20 @@ const ProductsPage = () => {
       deliver_date: "2024-09-05",
     },
   ]);
+
+  useEffect(()=>{
+    const fetchProduct = async () => {
+      try {
+        const fetchedProduct = await productApi.fetchProductData();
+        console.log(fetchedProduct, 'blablabla');
+        setProductData(fetchedProduct);
+      } catch (error) {
+        console.error('Error fetching product data:', error);
+      }
+    };
+
+    fetchProduct();
+  },[]);
 
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
 
