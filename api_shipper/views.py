@@ -114,8 +114,15 @@ class VisualizePackagesView(APIView):
                 'truck': truck_data,
                 'boxes': packages_data
             }
-            call_visualizer_microservice.delay(data_to_send)
-            return JsonResponse({'message': 'Visualization Task Submitted'}, status=status.HTTP_202_ACCEPTED)
+            # call_visualizer_microservice.delay(data_to_send)
+            external_server_url = 'http://swp_visualizer:8081/process/'
+            headers = {'Content-Type': 'application/json'}
+            try:
+                response = requests.post(url=external_server_url, headers=headers, json=data_to_send)
+                response.raise_for_status()
+                return JsonResponse({'message': 'Visualization Task Submitted'}, status=status.HTTP_202_ACCEPTED)
+            except requests.RequestException as e:
+                return {'error': str(e)}
         
         except Exception as e:
             return JsonResponse({'error': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
