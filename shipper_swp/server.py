@@ -2,9 +2,16 @@ import numpy as np
 import plotly.graph_objects as go
 import http.server
 import socketserver
+from flask import Flask, request, jsonify, render_template, abort
+import plotly.graph_objects as go
+import numpy as np
+
+app = Flask(__name__)
+
 
 class Box:
-    def __init__(self, length, breadth, height, weight, priority, box_id):
+    def __init__(self, id, length, breadth, height, weight, priority, box_id):
+        self.id = id
         self.length = length
         self.breadth = breadth
         self.height = height
@@ -24,7 +31,9 @@ class Box:
         ]
 
 class Truck:
-    def __init__(self, length, breadth, height, tare_weight, gvwr, axle_weight_ratings, axle_group_weight_ratings, wheel_load_capacity):
+    def __init__(self, id, model_name, length, breadth, height, tare_weight, gvwr, axle_weight_ratings, axle_group_weight_ratings, wheel_load_capacity):
+        self.id = id
+        self.model_name = model_name
         self.length = length
         self.breadth = breadth
         self.height = height
@@ -38,7 +47,7 @@ class Truck:
         self.weight_distribution = np.zeros((length, breadth, height), dtype=float)
         self.occupied = []
         self.current_weight = 0
-        self.center_of_gravity = [0, 0, 0]
+        self.center_of_gravity = [length / 2, breadth / 2, height / 2]
         self.axle_loads = [0] * len(axle_weight_ratings)
 
     def can_place_box(self, box, x, y, z):
@@ -83,7 +92,7 @@ class Truck:
     def update_center_of_gravity_after_removal(self, box, x, y, z):
         total_mass = self.current_weight + self.tare_weight
         if total_mass == 0:
-            self.center_of_gravity = [0, 0, 0]
+            self.center_of_gravity = [self.length / 2, self.breadth / 2, self.height / 2]
         else:
             new_cog_x = (self.center_of_gravity[0] * (total_mass + box.weight) - (x + box.length / 2) * box.weight) / total_mass
             new_cog_y = (self.center_of_gravity[1] * (total_mass + box.weight) - (y + box.breadth / 2) * box.weight) / total_mass
@@ -145,10 +154,14 @@ def calculate_volume_left(box, x, y, z, truck):
     return volume_left
 
 
+
 def plotly_draw_boxes(truck, occupied_boxes):
     fig = go.Figure()
 
-    axle_colors = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow']
+    axle_colors = ['blue', 'green', 'red', 'cyan']
+    highlighted_box_id = None
+
+    # Plot boxes
     for idx, (box, x, y, z) in enumerate(occupied_boxes):
         axle_index = int(x / (truck.length / len(truck.axle_weight_ratings)))
         color = axle_colors[axle_index % len(axle_colors)]
@@ -186,56 +199,142 @@ def plotly_draw_boxes(truck, occupied_boxes):
             j=j,
             k=k,
             opacity=0.5,
-            color=color
+            color=color,
+            name=box.box_id
         ))
+
+    # Plot axles
+    for i, position in enumerate(np.linspace(0, truck.length, len(truck.axle_weight_ratings))):
+        fig.add_trace(go.Scatter3d(
+            x=[position, position],
+            y=[0, truck.breadth],
+            z=[0, 0],
+            mode='lines+text',
+            line=dict(color='black', width=4),
+            text=[f'Axle {i+1}', f'Load: {truck.axle_loads[i]:.2f} kg'],
+            textposition='top right',
+            name=f'Axle {i+1}'
+        ))
+
+    # Add scatter plot for box IDs
+    ids_x = [x + box.length / 2 for box, x, y, z in occupied_boxes]
+    ids_y = [y + box.breadth / 2 for box, x, y, z in occupied_boxes]
+    ids_z = [z + box.height / 2 for box, x, y, z in occupied_boxes]
+    ids_text = [box.box_id for box, x, y, z in occupied_boxes]
+    
+    fig.add_trace(go.Scatter3d(
+        x=ids_x,
+        y=ids_y,
+        z=ids_z,
+        mode='text',
+        text=ids_text,
+        textposition='middle center',
+        marker=dict(size=5, color='black'),
+        name='Box IDs'
+    ))
+
+    # Calculate and annotate center of gravity and total weight
+    cog_x, cog_y, cog_z = truck.center_of_gravity
+    total_weight = truck.current_weight + truck.tare_weight
+
+    # Add center of mass trace
+    fig.add_trace(go.Scatter3d(
+        x=[cog_x],
+        y=[cog_y],
+        z=[cog_z],
+        mode='markers+text',
+        marker=dict(size=10, color='red'),
+        text=['Center of Gravity'],
+        textposition='top center',
+        name='Center of Gravity'
+    ))
+
+    # Add total weight annotation as text
+    fig.add_trace(go.Scatter3d(
+        x=[truck.length / 2],
+        y=[truck.breadth / 2],
+        z=[-truck.height * 0.1],  # Position this annotation below the plot
+        mode='text',
+        text=[f"Total Weight: {total_weight:.2f} kg"],
+        textposition='bottom center',
+        name='Total Weight'
+    ))
 
     fig.update_layout(
         scene=dict(
             xaxis_title='X',
             yaxis_title='Y',
             zaxis_title='Z',
-            xaxis=dict(nticks=4, range=[0, truck.length]),
-            yaxis=dict(nticks=4, range=[0, truck.breadth]),
-            zaxis=dict(nticks=4, range=[0, truck.height]),
-            aspectratio=dict(x=1, y=1, z=1)  # Ensures equal scaling for all axes
+            xaxis=dict(
+                nticks=10,
+                range=[0, truck.length],
+                title='Length'
+            ),
+            yaxis=dict(
+                nticks=10,
+                range=[0, truck.breadth],
+                title='Breadth'
+            ),
+            zaxis=dict(
+                nticks=10,
+                range=[0, truck.height],
+                title='Height'
+            ),
+            aspectratio=dict(
+                x=truck.length / max(truck.breadth, truck.height),
+                y=truck.breadth / max(truck.length, truck.height),
+                z=truck.height / max(truck.length, truck.breadth)
+            )
         ),
         title='3D Visualization of Packed Boxes'
     )
 
-    fig.write_html("shipper_swp/templates/truck_visualization_plotly.html")
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                type="dropdown",
+                x=1.15,
+                y=0.8,
+                buttons=[
+                    dict(
+                        label="Highlight",
+                        method="update",
+                        args=[{"showlegend": True}]
+                    ),
+                    dict(
+                        label="Reset",
+                        method="update",
+                        args=[{"showlegend": True}]
+                    )
+                ]
+            )
+        ]
+    )
+    
+    fig.write_html(f"shipper_swp/templates/truck_visualization_{truck.id}.html")
 
 
-# Example usage
-# Example usage
-boxes = [
-    Box(2, 2, 2, 500, 1, "Box1"),
-    Box(1, 1, 1, 100, 3, "Box2"),
-    Box(3, 3, 3, 900, 2, "Box3"),
-    Box(1, 2, 1, 200, 4, "Box4"),
-    Box(2, 2, 2, 500, 1, "Box5"),
-    Box(1, 1, 1, 100, 3, "Box6"),
-    Box(3, 3, 3, 900, 2, "Box7"),
-    Box(1, 2, 1, 200, 4, "Box8"),
-    Box(2, 2, 2, 500, 1, "Box9"),
-    Box(1, 1, 1, 100, 3, "Box10"),
-    Box(1, 1, 1, 100, 3, "Box11"),
-    Box(1, 1, 1, 100, 3, "Box12"),
-    Box(1, 1, 1, 100, 3, "Box13"),
-    Box(1, 1, 1, 200, 3, "Box14"),
-    Box(2, 1, 1, 200, 3, "Box15"),
-    Box(2, 2, 2, 500, 1, "Box1"),
-]
+@app.route('/process/', methods=['POST'])
+def process():
+    data = request.get_json()
+    boxes = [Box(**box_data) for box_data in data['boxes']]
+    truck = Truck(**data['truck'])
+    pack_boxes(boxes, truck)
+    plotly_draw_boxes(truck, truck.occupied)
+    return jsonify({'message': 'Boxes packed and visualization generated'})
 
-truck = Truck(length=5, breadth=5, height=6, tare_weight=2000, gvwr=10000, axle_weight_ratings=[2000, 2000, 2000, 2000], axle_group_weight_ratings=[8000], wheel_load_capacity=5000)
+@app.route('/visualization/<string:truck_id>/', methods=['GET'])
+def visualization(truck_id):
+    # Construct the template name based on the truck_id
+    template_name = f'truck_visualization_{truck_id}.html'
 
-pack_boxes(boxes, truck)
-plotly_draw_boxes(truck, truck.occupied)
+    try:
+        # Attempt to render the requested template
+        return render_template(template_name)
+    except Exception:
+        # Render a warning page if the specific template does not exist
+        return render_template('warning.html', message="The visualization does not exist or the URL might be incorrect"), 404
 
-# Set up the HTTP server
-PORT = 8080
-class Handler(http.server.SimpleHTTPRequestHandler):
-    pass
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print(f"Serving at port {PORT}")
-    httpd.serve_forever()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8081)

@@ -34,6 +34,10 @@ COPY ./compose/local/django/celery/flower/start.sh /start-flower.sh
 RUN sed -i 's/\r$//g' /start-flower.sh
 RUN chmod +x /start-flower.sh
 
+COPY ./compose/local/django/flask/start.sh /start-visualizer.sh
+RUN sed -i 's/\r$//g' /start-visualizer.sh
+RUN chmod +x /start-visualizer.sh
+
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint.sh"]
