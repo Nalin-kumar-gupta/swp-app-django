@@ -51,166 +51,21 @@ const ProductsPage = () => {
   //       fileReader.readAsBinaryString(file);
   //     }
   //   };
-  const [productData, setProductData] = useState([
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-    {
-      length: "1.20",
-      breadth: "0.80",
-      height: "0.50",
-      weight: "2.30",
-      destination: "NEW YORK",
-      deliver_date: "2024-09-10",
-    },
-    {
-      length: "2.00",
-      breadth: "1.00",
-      height: "1.00",
-      weight: "5.50",
-      destination: "LOS ANGELES",
-      deliver_date: "2024-09-15",
-    },
-    {
-      length: "1.80",
-      breadth: "1.20",
-      height: "1.50",
-      weight: "6.75",
-      destination: "CHICAGO",
-      deliver_date: "2024-09-05",
-    },
-  ]);
+  const [productData, setProductData] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         const fetchedProduct = await productApi.fetchProductData();
-        console.log(fetchedProduct, 'blablabla');
+        console.log(fetchedProduct, "blablabla");
         setProductData(fetchedProduct);
       } catch (error) {
-        console.error('Error fetching product data:', error);
+        console.error("Error fetching product data:", error);
       }
     };
 
     fetchProduct();
-  },[]);
+  }, []);
 
   const [vehicleModalOpen, setVehicleModalOpen] = useState(false);
 
@@ -218,7 +73,7 @@ const ProductsPage = () => {
     <div
       style={{ display: "flex", height: "calc(100vh - 92px)", padding: "10px" }}
     >
-      <VehicleModal open={vehicleModalOpen} setOpen={setVehicleModalOpen}/>
+      <VehicleModal open={vehicleModalOpen} setOpen={setVehicleModalOpen} />
       <div style={{ width: "40%", height: "100%" }}>
         <ProductForm
           productData={productData}
