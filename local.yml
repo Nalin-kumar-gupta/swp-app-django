@@ -93,5 +93,17 @@ services:
     environment:
       - NODE_ENV=development
 
+  visualizer:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: swp_visualizer
+    container_name: swp_visualizer
+    command: /start-visualizer.sh
+    volumes:
+      - .:/app
+    ports:
+      - "8081:8081"
+
 volumes:
   postgres_data:
