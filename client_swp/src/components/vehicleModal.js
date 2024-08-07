@@ -11,6 +11,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Divider } from "@mui/material";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
+import visualizeApi from "../utils/webApi/visualizeApi";
 
 const style = {
   position: "absolute",
@@ -136,7 +137,7 @@ const ListInput = (props) => {
 };
 
 const VehicleForm = (props) => {
-  const { selectedVehicle = null } = props;
+  const { selectedVehicle = null, setVisualize } = props;
 
   const [vehicleDetails, setVehicleDetails] = useState({});
 
@@ -171,10 +172,13 @@ const VehicleForm = (props) => {
     console.log(newVehicleDetails, "updated");
   };
 
-  const handleVisualize = () => {
-    console.log("hello");
-    console.log(selectedVehicle.id);
-  }
+  const handleVisualize = async () => {
+    const visualize = await visualizeApi.visualize({
+      truckId: selectedVehicle.id,
+    });
+    setVisualize(true);
+    console.log(visualize, "done");
+  };
 
   return (
     <form
@@ -315,10 +319,10 @@ const VehicleForm = (props) => {
 
 export default function BasicModal(props) {
   const { open, setOpen } = props;
-  const handleClose = () => setOpen(false);
   const [vehicleData, setVehicleData] = useState([]);
   const [vehicleForm, setVehicleForm] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [visualize, setVisualize] = useState(false);
   useEffect(() => {
     if (open) {
       const fetchVehicleData = async () => {
@@ -333,6 +337,12 @@ export default function BasicModal(props) {
       fetchVehicleData();
     }
   }, [open]);
+  const handleClose = () => {
+    setOpen(false);
+    setVisualize(false);
+    setSelectedVehicle(null);
+    setVehicleForm(false);
+  };
   const handleAddClick = () => {
     setVehicleForm(true);
   };
@@ -344,17 +354,12 @@ export default function BasicModal(props) {
   return (
     <Modal
       open={open}
+      onClose={handleClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box sx={style}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        {!visualize && (
           <div
             style={{
               display: "flex",
@@ -362,36 +367,57 @@ export default function BasicModal(props) {
               alignItems: "center",
             }}
           >
-            {vehicleForm && (
-              <ArrowBackIcon
-                onClick={() => {
-                  setVehicleForm(false);
-                  setSelectedVehicle(null);
-                }}
-                sx={{ fontSize: 25, marginRight: 2 }}
-              ></ArrowBackIcon>
-            )}
-            <Typography variant="h6">
-              {vehicleForm
-                ? selectedVehicle
-                  ? selectedVehicle.model_name
-                  : "Add Vehicle"
-                : "Select Vehicle"}
-            </Typography>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              {vehicleForm && (
+                <ArrowBackIcon
+                  onClick={() => {
+                    setVehicleForm(false);
+                    setSelectedVehicle(null);
+                  }}
+                  sx={{ fontSize: 25, marginRight: 2 }}
+                ></ArrowBackIcon>
+              )}
+              <Typography variant="h6">
+                {vehicleForm
+                  ? selectedVehicle
+                    ? selectedVehicle.model_name
+                    : "Add Vehicle"
+                  : "Select Vehicle"}
+              </Typography>
+            </div>
+            <Button onClick={handleClose} variant="outlined" color="error">
+              Cancel
+            </Button>
           </div>
-          <Button onClick={handleClose} variant="outlined" color="error">
-            Cancel
-          </Button>
-        </div>
-        {!vehicleForm ? (
-          <div style={{ display: "flex", flexWrap: "wrap", marginTop: "15px" }}>
-            <AddCard onClick={handleAddClick} />
-            {vehicleData.map((vehicle) => {
-              return <Vehicle {...vehicle} onClick={handleVehicleSelect} />;
-            })}
-          </div>
+        )}
+        {!visualize ? (
+          !vehicleForm ? (
+            <div
+              style={{ display: "flex", flexWrap: "wrap", marginTop: "15px" }}
+            >
+              <AddCard onClick={handleAddClick} />
+              {vehicleData.map((vehicle) => {
+                return <Vehicle {...vehicle} onClick={handleVehicleSelect} />;
+              })}
+            </div>
+          ) : (
+            <VehicleForm
+              setVisualize={setVisualize}
+              selectedVehicle={selectedVehicle}
+            />
+          )
         ) : (
-          <VehicleForm selectedVehicle={selectedVehicle} />
+          <iframe
+            src={`http://localhost:8081/visualization/${selectedVehicle.id}/`}
+            style={{ border: "none", width: "100%", height: "100%" }}
+            title="Content Frame"
+          />
         )}
       </Box>
     </Modal>
