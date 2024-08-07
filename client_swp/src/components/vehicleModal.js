@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const style = {
   position: "absolute",
@@ -37,12 +38,13 @@ const Vehicle = (props) => {
 
 const AddCard = () => {
   return (
-    <Card sx={{ maxWidth: 345, border: "2px solid gray", margin: "10px" }}>
+    <Card sx={{ maxWidth: 345, border: "2px solid gray", margin: "10px", textAlign:"center" }}>
       <CardContent>
         <Typography gutterBottom component="div">
           Add Vehicle
         </Typography>
       </CardContent>
+      <AddCircleOutlineIcon sx={{ fontSize: 40, marginBottom: "5px", color:"gray" }}/>
     </Card>
   );
 };
