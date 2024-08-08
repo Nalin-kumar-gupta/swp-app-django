@@ -63,7 +63,7 @@ class Package(models.Model):
     destination = models.CharField(max_length=50)
     deliver_date = models.DateField()
 
-    allocation = models.ForeignKey(Truck, default=None, null=True, blank=True, on_delete=models.SET_NULL, editable=False)
+    allocation = models.CharField(max_length=50, default="---")
 
     @property
     def volume(self):

@@ -10,24 +10,23 @@ app = Flask(__name__)
 
 
 class Box:
-    def __init__(self, id, length, breadth, height, weight, priority, box_id):
+    def __init__(self, id, length, breadth, height, weight, box_id):
         self.id = id
         self.length = length
         self.breadth = breadth
         self.height = height
         self.weight = weight
-        self.priority = priority
         self.box_id = box_id
         self.volume = length * breadth * height
 
     def get_rotations(self):
         return [
-            Box(self.length, self.breadth, self.height, self.weight, self.priority, self.box_id),
-            Box(self.length, self.height, self.breadth, self.weight, self.priority, self.box_id),
-            Box(self.breadth, self.length, self.height, self.weight, self.priority, self.box_id),
-            Box(self.breadth, self.height, self.length, self.weight, self.priority, self.box_id),
-            Box(self.height, self.length, self.breadth, self.weight, self.priority, self.box_id),
-            Box(self.height, self.breadth, self.length, self.weight, self.priority, self.box_id)
+            Box(self.id, self.length, self.breadth, self.height, self.weight, self.box_id),
+            Box(self.id, self.length, self.height, self.breadth, self.weight, self.box_id),
+            Box(self.id, self.breadth, self.length, self.height, self.weight, self.box_id),
+            Box(self.id, self.breadth, self.height, self.length, self.weight, self.box_id),
+            Box(self.id, self.height, self.length, self.breadth, self.weight, self.box_id),
+            Box(self.id, self.height, self.breadth, self.length, self.weight, self.box_id)
         ]
 
 class Truck:
@@ -115,34 +114,17 @@ class Truck:
 
 def find_best_position(truck, box):
     best_position = None
-    best_volume_left = -1
+    best_volume_left = float('inf')
     
     for z in range(truck.height - box.height + 1):
         for y in range(truck.breadth - box.breadth + 1):
             for x in range(truck.length - box.length + 1):
                 if truck.can_place_box(box, x, y, z):
-                    volume_left = (truck.length - x - box.length) * (truck.breadth - y - box.breadth)
-                    if volume_left > best_volume_left:
+                    volume_left = calculate_volume_left(box, x, y, z, truck)
+                    if volume_left < best_volume_left:
                         best_volume_left = volume_left
                         best_position = (x, y, z)
     return best_position
-
-def pack_boxes(boxes, truck):
-    sorted_boxes = sorted(boxes, key=lambda box: (-box.priority, -box.volume))
-    
-    for z in range(truck.height):
-        for y in range(truck.breadth):
-            for x in range(truck.length):
-                for box in sorted_boxes:
-                    if truck.can_place_box(box, x, y, z):
-                        truck.place_box(box, x, y, z)
-                        if not truck.check_axle_loads():
-                            truck.remove_box(box, x, y, z)
-                        else:
-                            sorted_boxes.remove(box)
-                            break  # Move to the next position after placing a box
-    return truck.occupied
-
 
 def calculate_volume_left(box, x, y, z, truck):
     volume_left = 0
@@ -152,6 +134,29 @@ def calculate_volume_left(box, x, y, z, truck):
                 if not truck.space[i, j, k]:
                     volume_left += 1
     return volume_left
+
+def pack_truck(truck, boxes):
+    boxes.sort(key=lambda box: box.volume, reverse=True)
+    for box in boxes:
+        best_position = None
+        best_box = None
+        best_volume_left = float('inf')
+        
+        for rotation in box.get_rotations():
+            position = find_best_position(truck, rotation)
+            if position:
+                x, y, z = position
+                volume_left = calculate_volume_left(rotation, x, y, z, truck)
+                if volume_left < best_volume_left:
+                    best_volume_left = volume_left
+                    best_position = (x, y, z)
+                    best_box = rotation
+        
+        if best_box and best_position:
+            x, y, z = best_position
+            truck.place_box(best_box, x, y, z)
+            if not truck.check_axle_loads():
+                truck.remove_box(best_box, x, y, z)
 
 
 
@@ -317,11 +322,28 @@ def plotly_draw_boxes(truck, occupied_boxes):
 @app.route('/process/', methods=['POST'])
 def process():
     data = request.get_json()
+    data  = {'truck': {'id': '4f4363fa-b92b-47b6-a6cf-061718a0fd3e', 'model_name': 'Volvo FH16', 'length': 12, 'breadth': 2, 'height': 4, 'tare_weight': 8000, 'gvwr': 18000, 'axle_weight_ratings': [4000, 4000, 4000], 'axle_group_weight_ratings': [6000, 6000], 'wheel_load_capacity': 5000}, 'boxes': [{'id': 'dd6c6243-cd3c-487e-a58d-7f71055f2742', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Electronics Set'}, {'id': 'bbc6b77e-8215-4561-9ff6-ddaaf3fe8eca', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 300, 'box_id': 'Books Collection'}, {'id': '9990b097-6a86-46f2-a88c-201bb6c67711', 'length': 3, 'breadth': 3, 'height': 3, 'weight': 800, 'box_id': 'Furniture Set'}, {'id': 'a3251114-8977-4deb-b99e-2789b93d84a9', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 600, 'box_id': 'Clothing Box'}, {'id': 'fd333adb-7ab7-444b-b66a-8506de534953', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Kitchen Appliances'}, {'id': 'd61d3b7b-2056-4338-b9db-d1ee1ff2aa4d', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Fitness Equipment'}, {'id': '655c2fbe-8b7f-4796-95f5-eae23aea6582', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 300, 'box_id': 'Office Supplies'}, {'id': '01a4a0a1-1968-4be0-af01-f81125a16fd3', 'length': 3, 'breadth': 3, 'height': 3, 'weight': 800, 'box_id': 'Home Decor'}, {'id': 'dd2de97b-6637-4de1-bcaa-9a5725180527', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Medical Supplies'}, {'id': '0eb90a68-eaa3-456f-95f7-f3844a25604e', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Toys and Games'}, {'id': 'b4c17b6b-9571-4145-b7bc-4dfeaa0b51dd', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 600, 'box_id': 'Garden Tools'}, {'id': '43bf18dd-c559-4d90-aa53-78f054e46add', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Beauty Products'}, {'id': '5f4450f2-dda0-4d0c-88c6-8a719b4ff113', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Books and Magazines'}]}
     boxes = [Box(**box_data) for box_data in data['boxes']]
     truck = Truck(**data['truck'])
-    pack_boxes(boxes, truck)
+    for box in boxes:
+        best_position = find_best_position(truck, box)
+        if best_position:
+            x, y, z = best_position
+            truck.place_box(box, x, y, z)
+
+    pack_truck(truck, boxes)
     plotly_draw_boxes(truck, truck.occupied)
-    return jsonify({'message': 'Boxes packed and visualization generated'})
+    box_ids = []
+
+    # Iterate over the occupied boxes and collect their IDs
+    for box, x, y, z in truck.occupied:
+        box_ids.append(box.box_id)
+
+    # Create the response message
+    response_message = {'message': 'Boxes packed and visualization generated', 'box_ids': box_ids}
+
+    # Return the response as JSON
+    return jsonify(response_message)
 
 @app.route('/visualization/<string:truck_id>/', methods=['GET'])
 def visualization(truck_id):
@@ -338,3 +360,8 @@ def visualization(truck_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8081)
+
+
+
+
+

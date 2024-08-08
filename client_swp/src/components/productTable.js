@@ -39,7 +39,9 @@ export default function CustomizedTables(props) {
             <StyledTableCell align="center">Height (m)</StyledTableCell>
             <StyledTableCell align="center">Weight (kg)</StyledTableCell>
             <StyledTableCell align="center">Destination</StyledTableCell>
+            <StyledTableCell align="center">Status</StyledTableCell>
             <StyledTableCell align="center">Deliver Date</StyledTableCell>
+            <StyledTableCell align="center">Allocation</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -53,7 +55,13 @@ export default function CustomizedTables(props) {
                 {row.destination}
               </StyledTableCell>
               <StyledTableCell align="center">
+                {row.status}
+              </StyledTableCell>
+              <StyledTableCell align="center">
                 {row.deliver_date}
+              </StyledTableCell>
+              <StyledTableCell align="center">
+                {row.allocation}
               </StyledTableCell>
             </StyledTableRow>
           ))}

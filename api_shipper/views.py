@@ -65,7 +65,6 @@ class TruckViewSet(viewsets.ModelViewSet):
 class VisualizePackagesView(APIView):
     def post(self, request, *args, **kwargs):
         truck_id = request.data.get('truck_id')
-        print("23456789012345678", truck_id)
 
         if not truck_id:
             return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -73,7 +72,6 @@ class VisualizePackagesView(APIView):
         try:
             # Retrieve the truck based on the provided ID
             truck = Truck.objects.get(id=truck_id)
-            print("qoiweoqwdhuqwehiuewq", truck.model_name)
             
             # Retrieve packages with the same destination and status 'inventory'
             packages = Package.objects.filter(
@@ -101,9 +99,9 @@ class VisualizePackagesView(APIView):
                     'breadth': int(pkg.breadth),  # Convert to integer
                     'height': int(pkg.height),  # Convert to integer
                     'weight': int(pkg.weight),
-                    # 'priority': pkg.priority,   # Convert to integer
-                    'priority': 3,
                     'box_id': pkg.name,
+                    # 'priority': pkg.priority,   # Convert to integer
+                    # 'priority': 3,
 
                 }
                 for pkg in packages
@@ -120,6 +118,20 @@ class VisualizePackagesView(APIView):
             try:
                 response = requests.post(url=external_server_url, headers=headers, json=data_to_send)
                 response.raise_for_status()
+                allocated_boxes = response.json().get("box_ids", None)
+
+                if allocated_boxes:
+                    for box_id in allocated_boxes:
+                        try:
+                            package = Package.objects.get(name=box_id, destination=truck.destination)
+                            package.status = "allocated"
+                            package.allocation = truck.model_name
+                            package.save()
+                        except Package.DoesNotExist:
+                            print(f"Package with name {box_id} and destination {truck.destination} does not exist.")
+                else:
+                    print("No box_ids found in the response.")
+
                 return JsonResponse({'message': 'Visualization Task Submitted'}, status=status.HTTP_202_ACCEPTED)
             except requests.RequestException as e:
                 return {'error': str(e)}

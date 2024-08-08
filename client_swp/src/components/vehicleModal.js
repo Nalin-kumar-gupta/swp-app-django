@@ -111,6 +111,7 @@ const ListInput = (props) => {
               type="number"
               label={`${prefix ?? "Axle"} ${index + 1}`}
               value={item}
+              inputProps={{ min: 0 }}
               onChange={(e) => handleChange(index, e)}
               variant="outlined"
             />
@@ -216,7 +217,7 @@ const VehicleForm = (props) => {
           sx={{ m: 1, width: "25ch" }}
           // min="0"
           InputProps={{
-            endAdornment: <InputAdornment position="end">m</InputAdornment>,
+            min: 0, endAdornment: <InputAdornment position="end">m</InputAdornment>,
           }}
           onChange={handleChange}
           required
@@ -229,7 +230,7 @@ const VehicleForm = (props) => {
           type="number"
           sx={{ m: 1, width: "25ch" }}
           InputProps={{
-            endAdornment: <InputAdornment position="end">m</InputAdornment>,
+            min: 0, endAdornment: <InputAdornment position="end">m</InputAdornment>,
           }}
           onChange={handleChange}
           required
@@ -242,7 +243,7 @@ const VehicleForm = (props) => {
           type="number"
           sx={{ m: 1, width: "25ch" }}
           InputProps={{
-            endAdornment: <InputAdornment position="end">m</InputAdornment>,
+            min: 0, endAdornment: <InputAdornment position="end">m</InputAdornment>,
           }}
           onChange={handleChange}
           required
@@ -258,7 +259,7 @@ const VehicleForm = (props) => {
           type="number"
           sx={{ m: 1, width: "25ch" }}
           InputProps={{
-            endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            min: 0, endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
           onChange={handleChange}
           required
@@ -269,6 +270,7 @@ const VehicleForm = (props) => {
           value={vehicleDetails.gvwr}
           id="outlined-start-adornment"
           sx={{ m: 1, width: "25ch" }}
+          inputProps={{ min: 0 }}
           onChange={handleChange}
           required
         />
@@ -277,6 +279,7 @@ const VehicleForm = (props) => {
           name="wheel_load_capacity"
           value={vehicleDetails.wheel_load_capacity}
           sx={{ m: 1, width: "25ch" }}
+          inputProps={{ min: 0 }}
           type="number"
           onChange={handleChange}
           required
