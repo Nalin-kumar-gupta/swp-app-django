@@ -120,22 +120,23 @@ class VisualizePackagesView(APIView):
             try:
                 response = requests.post(url=external_server_url, headers=headers, json=data_to_send)
                 response.raise_for_status()
-                allocated_boxes = response.json().get("box_ids", None)
+                allocated_boxes = response.json().get("box_ids", {})
 
                 if allocated_boxes:
-                    for box_id in allocated_boxes:
-                        print("*********************", box_id)
-                        try:
-                            package = Package.objects.get(name=box_id, destination=truck.destination)
-                            package.status = "allocated"
-                            package.allocation = truck.model_name
-                            package.save()
-                        except Package.DoesNotExist:
-                            print(f"Package with name {box_id} and destination {truck.destination} does not exist.")
+                    return JsonResponse({'mark_boxes': allocated_boxes}, status=status.HTTP_202_ACCEPTED)
+                    # for box_id in allocated_boxes:
+                    #     print("*********************", box_id)
+                    #     try:
+                    #         package = Package.objects.get(name=box_id, destination=truck.destination)
+                    #         package.status = "allocated"
+                    #         package.allocation = truck.model_name
+                    #         package.save()
+                    #     except Package.DoesNotExist:
+                    #         print(f"Package with name {box_id} and destination {truck.destination} does not exist.")
                 else:
                     print("No box_ids found in the response.")
 
-                return JsonResponse({'message': 'Visualization Task Submitted'}, status=status.HTTP_202_ACCEPTED)
+                return JsonResponse({'mark_boxes': allocated_boxes}, status=status.HTTP_202_ACCEPTED)
             except requests.RequestException as e:
                 return {'error': str(e)}
         
