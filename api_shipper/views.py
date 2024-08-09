@@ -120,9 +120,10 @@ class VisualizePackagesView(APIView):
             try:
                 response = requests.post(url=external_server_url, headers=headers, json=data_to_send)
                 response.raise_for_status()
-                allocated_boxes = response.json().get("box_ids", None)
+                allocated_boxes = response.json().get("box_ids", {})
 
                 if allocated_boxes:
+                    return JsonResponse({'mark_boxes': allocated_boxes}, status=status.HTTP_202_ACCEPTED)
                     for box_id in allocated_boxes:
                         print("*********************", box_id)
                         try:
@@ -135,9 +136,72 @@ class VisualizePackagesView(APIView):
                 else:
                     print("No box_ids found in the response.")
 
-                return JsonResponse({'message': 'Visualization Task Submitted'}, status=status.HTTP_202_ACCEPTED)
+                return JsonResponse({'mark_boxes': allocated_boxes}, status=status.HTTP_202_ACCEPTED)
             except requests.RequestException as e:
                 return {'error': str(e)}
         
         except Exception as e:
             return JsonResponse({'error': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import Approval, Truck
+from .serializers import ApprovalSerializer
+import json
+
+class CreateApprovalAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            truck_id = data.get('truck_id')
+
+            if not truck_id:
+                return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            truck = get_object_or_404(Truck, id=truck_id)
+
+            existing_approval = Approval.objects.filter(approval_truck=truck).first()
+            if existing_approval:
+                return Response({'message': 'Approval already exists for this truck'}, status=status.HTTP_200_OK)
+
+            new_approval = Approval(approval_truck=truck)
+            new_approval.save()
+
+            serializer = ApprovalSerializer(new_approval)
+            return Response({'message': 'Approval created successfully', 'approval': serializer.data}, status=status.HTTP_201_CREATED)
+
+        except json.JSONDecodeError:
+            return Response({'error': 'Invalid JSON'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def get(self, request, *args, **kwargs):
+        try:
+            print("Query Params:", request.query_params) 
+            truck_id = request.GET.get('truck_id[truckId]', None) 
+            print("!@#$%^&(*&^%$#@!$%^)", truck_id)
+
+            if not truck_id:
+                return Response({'status': 'No approval request initiated for this truck'}, status=status.HTTP_200_OK)
+            truck = get_object_or_404(Truck, id=truck_id)
+
+            approval = Approval.objects.filter(approval_truck=truck).first()
+            if approval:
+                serializer = ApprovalSerializer(approval)
+                if approval.status == "pending":
+                    return Response({'status': "Pending approval request"}, status=status.HTTP_200_OK)
+                elif approval.status == "approved":
+                    return Response({'status': "Approved"}, status=status.HTTP_200_OK)
+                elif approval.status == "rejected":
+                    return Response({'status': "Rejected"}, status=status.HTTP_200_OK)
+
+                return Response({'status': approval.status}, status=status.HTTP_200_OK)
+            else:
+                return Response({'status': 'No approval request initiated for this truck'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

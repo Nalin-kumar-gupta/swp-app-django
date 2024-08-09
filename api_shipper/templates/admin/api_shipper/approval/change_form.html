@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+{% block content %}
+  <div>
+    <h2>Approval</h2>
+    <fieldset class="module aligned">
+      <div class="form-row">
+        <div class="field-box">
+          <label for="id_visualization_link">Visualization Link:</label>
+          <p>{{ visualization_link|safe }}</p>
+        </div>
+      </div>
+    </fieldset>
+    {% block submit_buttons_bottom %}
+      <div class="submit-row">
+        <input type="submit" value="Save" class="default" />
+        <input type="submit" value="Save and continue editing" class="default" />
+        <a class="button" href="{% url 'admin:index' %}">Back</a>
+      </div>
+    {% endblock %}
+  </div>
+{% endblock %}

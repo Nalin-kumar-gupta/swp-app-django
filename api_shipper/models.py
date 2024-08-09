@@ -85,3 +85,22 @@ class Package(models.Model):
         return f"Package {self.id} - Volume: {self.volume} m³"
 
 
+class Approval(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    approval_truck = models.ForeignKey('Truck', on_delete=models.CASCADE)
+    link = models.URLField(default='http://localhost:8081/visualization/warn/')  
+    packages = models.JSONField(default=dict)
+    STATUS_CHOICES = [
+        ('pending', 'Pending Admin Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', editable=False)
+
+    def save(self, *args, **kwargs):
+        if self.approval_truck:
+            self.link = f'http://localhost:8081/visualization/{self.approval_truck.id}/'
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Approval for Truck {self.approval_truck}"

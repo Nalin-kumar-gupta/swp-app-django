@@ -13,6 +13,8 @@ import { Divider } from "@mui/material";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import visualizeApi from "../utils/webApi/visualizeApi";
+import approvalApi from "../utils/webApi/approvalApi";
+import fetchApprovalApi from "../utils/webApi/fetchApprovalApi";
 import RandomImage from "../utils/webApi/getRandomImageUrls";
 
 const style = {
@@ -161,6 +163,7 @@ const VehicleForm = (props) => {
   const { selectedVehicle = null, setVisualize } = props;
 
   const [vehicleDetails, setVehicleDetails] = useState({});
+  const [approvalStatus, setApprovalStatus] = useState('Approval not requested');
 
   const [axleList, setAxleList] = useState(
     selectedVehicle?.axle_weight_ratings
@@ -201,12 +204,53 @@ const VehicleForm = (props) => {
     console.log(visualize, "done");
   };
 
+
+  const handleFetchApproval = async () => {
+    const fetchApproval = await fetchApprovalApi.fetchApproval({
+      truckId: selectedVehicle?.id,
+    });
+    console.log(fetchApproval.status, "approvalf");
+    setApprovalStatus(fetchApproval.status);
+
+  };
+  handleFetchApproval()
+  const handleApproval = async () => {
+    handleFetchApproval()
+    const approval = await approvalApi.approval({
+      truckId: selectedVehicle.id,
+    });
+    // setVisualize(true);
+    console.log(approval, "done");
+  };
+
+  
+
   return (
     <form
       onSubmit={handleSubmitForm}
       style={{ marginTop: "10px", height: "100%" }}
     >
       <div style={{ height: "80%", overflowY: "scroll" }}>
+        <Divider sx={{ margin: "15px 15px 0 0", padding: "10px" }}>
+          Approval Status 
+        </Divider>
+        <Typography 
+                variant="h6" 
+                sx={{ flexGrow: 1 }}
+            >
+                {approvalStatus}
+            </Typography>
+            {/* <Button
+                variant="contained"
+                color="primary"
+                onClick={handleFetchApproval}
+                sx={{ marginLeft: '16px' }}
+            >
+                Refresh Status
+            </Button> */}
+        <Divider sx={{ margin: "15px 15px 0 0", padding: "10px" }}>
+          Vehicle Details
+        </Divider>
         <TextField
           label="Model Name"
           name="model_name"
@@ -326,6 +370,7 @@ const VehicleForm = (props) => {
           {selectedVehicle ? "Update Vehicle" : "Add Vehicle"}
         </Button>
         {selectedVehicle && (
+          <>
           <Button
             sx={{ margin: "15px 0 0 10px", display: "block" }}
             variant="contained"
@@ -334,6 +379,15 @@ const VehicleForm = (props) => {
           >
             Visualize
           </Button>
+          <Button
+          sx={{ margin: "15px 0 0 10px", display: "block" }}
+          variant="contained"
+          color="success"
+          onClick={handleApproval}
+        >
+          Ask for Approval
+        </Button>
+        </>
         )}
       </div>
     </form>
