@@ -3,7 +3,7 @@
 ## Smart Walmart Packager
 
 ## Table of Contents
-
+-   [Problem Statement](#problem-statement)
 -   [Project Overview](#project-overview)
 -   [Features](#features)
 -   [Installation](#installation)
@@ -12,6 +12,16 @@
 -   [Contributing](#contributing)
 -   [License](#license)
 -   [Contact](#contact)
+
+## Problem Statement
+================
+The truck loading process is a significant challenge in the logistics industry, resulting in inefficient use of space, weight imbalance, and excessive fuel consumption. This problem statement highlights the need for a space-optimized loading system to address these challenges and improve the overall efficiency of logistics operations.
+
+1. According to the National Highway Traffic Safety Administration (NHTSA), in 2019, there were over 4,900 crashes involving large trucks in the United States, resulting in 5,005 fatalities and 123,000 injuries (NHTSA, 2020).
+2. A study by the American Transportation Research Institute (ATRI) found that the trucking industry loses approximately 1.3 billion gallons of fuel annually due to weight imbalance and inefficient loading practices (ATRI, 2018).
+3. The Federal Motor Carrier Safety Administration (FMCSA) reports that in 2019, there were over 415,000 police-reported crashes involving large trucks in the United States, resulting in over 4,000 fatalities and 100,000 injuries (FMCSA, 2020).
+4. A study by the National Academy of Sciences found that the trucking industry could reduce fuel consumption by up to 20% through the adoption of more efficient loading practices and technologies (National Academy of Sciences, 2015).
+5. The International Council on Clean Transportation estimates that the trucking industry could reduce greenhouse gas emissions by up to 40% through the adoption of more efficient loading practices and technologies (International Council on Clean Transportation, 2019).
 
 ## Project Overview
 ================
