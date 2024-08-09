@@ -124,15 +124,15 @@ class VisualizePackagesView(APIView):
 
                 if allocated_boxes:
                     return JsonResponse({'mark_boxes': allocated_boxes}, status=status.HTTP_202_ACCEPTED)
-                    # for box_id in allocated_boxes:
-                    #     print("*********************", box_id)
-                    #     try:
-                    #         package = Package.objects.get(name=box_id, destination=truck.destination)
-                    #         package.status = "allocated"
-                    #         package.allocation = truck.model_name
-                    #         package.save()
-                    #     except Package.DoesNotExist:
-                    #         print(f"Package with name {box_id} and destination {truck.destination} does not exist.")
+                    for box_id in allocated_boxes:
+                        print("*********************", box_id)
+                        try:
+                            package = Package.objects.get(name=box_id, destination=truck.destination)
+                            package.status = "allocated"
+                            package.allocation = truck.model_name
+                            package.save()
+                        except Package.DoesNotExist:
+                            print(f"Package with name {box_id} and destination {truck.destination} does not exist.")
                 else:
                     print("No box_ids found in the response.")
 
@@ -186,8 +186,7 @@ class CreateApprovalAPIView(APIView):
             print("!@#$%^&(*&^%$#@!$%^)", truck_id)
 
             if not truck_id:
-                return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-
+                return Response({'status': 'No approval request initiated for this truck'}, status=status.HTTP_200_OK)
             truck = get_object_or_404(Truck, id=truck_id)
 
             approval = Approval.objects.filter(approval_truck=truck).first()
@@ -202,7 +201,7 @@ class CreateApprovalAPIView(APIView):
 
                 return Response({'status': approval.status}, status=status.HTTP_200_OK)
             else:
-                return Response({'status': 'No approval request found for this truck'}, status=status.HTTP_200_OK)
+                return Response({'status': 'No approval request initiated for this truck'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

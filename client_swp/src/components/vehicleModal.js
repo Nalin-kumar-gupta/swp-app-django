@@ -207,7 +207,7 @@ const VehicleForm = (props) => {
 
   const handleFetchApproval = async () => {
     const fetchApproval = await fetchApprovalApi.fetchApproval({
-      truckId: selectedVehicle.id,
+      truckId: selectedVehicle?.id,
     });
     console.log(fetchApproval.status, "approvalf");
     setApprovalStatus(fetchApproval.status);
