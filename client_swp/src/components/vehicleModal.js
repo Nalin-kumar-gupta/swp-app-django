@@ -204,13 +204,6 @@ const VehicleForm = (props) => {
     console.log(visualize, "done");
   };
 
-  const handleApproval = async () => {
-    const approval = await approvalApi.approval({
-      truckId: selectedVehicle.id,
-    });
-    // setVisualize(true);
-    console.log(approval, "done");
-  };
 
   const handleFetchApproval = async () => {
     const fetchApproval = await fetchApprovalApi.fetchApproval({
@@ -219,6 +212,15 @@ const VehicleForm = (props) => {
     console.log(fetchApproval.status, "approvalf");
     setApprovalStatus(fetchApproval.status);
 
+  };
+  handleFetchApproval()
+  const handleApproval = async () => {
+    handleFetchApproval()
+    const approval = await approvalApi.approval({
+      truckId: selectedVehicle.id,
+    });
+    // setVisualize(true);
+    console.log(approval, "done");
   };
 
   
@@ -238,14 +240,14 @@ const VehicleForm = (props) => {
             >
                 {approvalStatus}
             </Typography>
-            <Button
+            {/* <Button
                 variant="contained"
                 color="primary"
                 onClick={handleFetchApproval}
                 sx={{ marginLeft: '16px' }}
             >
                 Refresh Status
-            </Button>
+            </Button> */}
         <Divider sx={{ margin: "15px 15px 0 0", padding: "10px" }}>
           Vehicle Details
         </Divider>
