@@ -62,6 +62,7 @@ class Package(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='inventory', editable=False)
     destination = models.CharField(max_length=50)
     deliver_date = models.DateField()
+    stock = models.IntegerField(default=2)
 
     allocation = models.CharField(max_length=50, default="---")
 

@@ -4,7 +4,7 @@ from .models import Package
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ['id', 'name', 'length', 'breadth', 'height', 'weight', 'status', 'destination', 'deliver_date', 'allocation', 'volume', 'priority']
+        fields = ['id', 'name', 'length', 'breadth', 'height', 'weight', 'status', 'destination', 'deliver_date', 'allocation', 'volume', 'priority', 'stock']
         read_only_fields = ['id', 'volume', 'priority']
 
     def validate(self, data):

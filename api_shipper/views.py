@@ -9,6 +9,7 @@ import http.client
 import json
 from django.http import JsonResponse
 from api_shipper.tasks import call_visualizer_microservice
+import random
 
 class PackageViewSet(viewsets.ModelViewSet):
     queryset = Package.objects.all()
@@ -100,13 +101,14 @@ class VisualizePackagesView(APIView):
                     'height': int(pkg.height),  # Convert to integer
                     'weight': int(pkg.weight),
                     'box_id': pkg.name,
+                    'stock' : pkg.stock,
                     # 'priority': pkg.priority,   # Convert to integer
                     # 'priority': 3,
 
                 }
                 for pkg in packages
             ]
-
+            # random.shuffle(packages_data)
             # Prepare data to send to external server
             data_to_send = {
                 'truck': truck_data,
@@ -122,6 +124,7 @@ class VisualizePackagesView(APIView):
 
                 if allocated_boxes:
                     for box_id in allocated_boxes:
+                        print("*********************", box_id)
                         try:
                             package = Package.objects.get(name=box_id, destination=truck.destination)
                             package.status = "allocated"

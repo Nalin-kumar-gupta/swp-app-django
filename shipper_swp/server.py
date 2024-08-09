@@ -335,8 +335,18 @@ def plotly_draw_boxes(truck, occupied_boxes):
 @app.route('/process/', methods=['POST'])
 def process():
     data = request.get_json()
-    data  = {'truck': {'id': '4f4363fa-b92b-47b6-a6cf-061718a0fd3e', 'model_name': 'Volvo FH16', 'length': 12, 'breadth': 2, 'height': 4, 'tare_weight': 8000, 'gvwr': 18000, 'axle_weight_ratings': [4000, 4000, 4000], 'axle_group_weight_ratings': [6000, 6000], 'wheel_load_capacity': 5000}, 'boxes': [{'id': 'dd6c6243-cd3c-487e-a58d-7f71055f2742', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Electronics Set'}, {'id': 'bbc6b77e-8215-4561-9ff6-ddaaf3fe8eca', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 300, 'box_id': 'Books Collection'}, {'id': '9990b097-6a86-46f2-a88c-201bb6c67711', 'length': 3, 'breadth': 3, 'height': 3, 'weight': 800, 'box_id': 'Furniture Set'}, {'id': 'a3251114-8977-4deb-b99e-2789b93d84a9', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 600, 'box_id': 'Clothing Box'}, {'id': 'fd333adb-7ab7-444b-b66a-8506de534953', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Kitchen Appliances'}, {'id': 'd61d3b7b-2056-4338-b9db-d1ee1ff2aa4d', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Fitness Equipment'}, {'id': '655c2fbe-8b7f-4796-95f5-eae23aea6582', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 300, 'box_id': 'Office Supplies'}, {'id': '01a4a0a1-1968-4be0-af01-f81125a16fd3', 'length': 3, 'breadth': 3, 'height': 3, 'weight': 800, 'box_id': 'Home Decor'}, {'id': 'dd2de97b-6637-4de1-bcaa-9a5725180527', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Medical Supplies'}, {'id': '0eb90a68-eaa3-456f-95f7-f3844a25604e', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Toys and Games'}, {'id': 'b4c17b6b-9571-4145-b7bc-4dfeaa0b51dd', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 600, 'box_id': 'Garden Tools'}, {'id': '43bf18dd-c559-4d90-aa53-78f054e46add', 'length': 1, 'breadth': 1, 'height': 1, 'weight': 350, 'box_id': 'Beauty Products'}, {'id': '5f4450f2-dda0-4d0c-88c6-8a719b4ff113', 'length': 2, 'breadth': 2, 'height': 2, 'weight': 500, 'box_id': 'Books and Magazines'}]}
-    boxes = [Box(**box_data) for box_data in data['boxes']]
+    print(data)
+    boxes = []
+
+    # Iterate over each box_data in the data['boxes'] list
+    for box_data in data['boxes']:
+        # Extract the stock number and remove it from box_data
+        stock = box_data.pop('stock')
+        
+        # Create multiple instances of Box according to the stock number
+        for _ in range(int(stock / 2)):
+            boxes.append(Box(**box_data))
+
     truck = Truck(**data['truck'])
     for box in boxes:
         best_position = find_best_position(truck, box)
