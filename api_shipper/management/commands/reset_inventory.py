@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Hardcoded superuser credentials
-        username = 'admin'
+        username = 'SrArchitect@walmart'
         email = 'admin@example.com'
         password = 'adminpassword'
 
