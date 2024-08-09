@@ -15,7 +15,10 @@ import InputAdornment from "@mui/material/InputAdornment";
 import visualizeApi from "../utils/webApi/visualizeApi";
 import approvalApi from "../utils/webApi/approvalApi";
 import fetchApprovalApi from "../utils/webApi/fetchApprovalApi";
-import RandomImage from "../utils/webApi/getRandomImageUrls";
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import PendingIcon from '@mui/icons-material/Pending';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const style = {
   position: "absolute",
@@ -223,6 +226,21 @@ const VehicleForm = (props) => {
     console.log(approval, "done");
   };
 
+  const getApprovalIcon = (status) => {
+    switch (status) {
+      case 'No approval request initiated for this truck':
+        return <HourglassEmptyIcon color="disabled" />; // Example color
+      case 'Pending approval request':
+        return <PendingIcon color="warning" />; // Example color
+      case 'Approved':
+        return <CheckCircleIcon color="success" />; // Example color
+      case 'Rejected':
+        return <CancelIcon color="error" />; // Example color
+      default:
+        return null;
+    }
+  };
+
   
 
   return (
@@ -234,6 +252,7 @@ const VehicleForm = (props) => {
         <Divider sx={{ margin: "15px 15px 0 0", padding: "10px" }}>
           Approval Status 
         </Divider>
+        {getApprovalIcon(approvalStatus)}
         <Typography 
                 variant="h6" 
                 sx={{ flexGrow: 1 }}
