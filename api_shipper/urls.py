@@ -9,7 +9,7 @@ router.register(r'trucks-boarding', TruckViewSet, basename='truck')
 urlpatterns = [
     path('', include(router.urls)),
     path('visualize-packages/', VisualizePackagesView.as_view(), name='visualize_packages'),
-    path('approval/', CreateApprovalAPIView.as_view(), name='approval_api'),
+    path('approval/', CreateApprovalAPIView.as_view(), name='approval'),
 ]
 
 

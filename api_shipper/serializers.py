@@ -49,3 +49,13 @@ class TruckSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Destination cannot be more than 50 characters long.")
         
         return data
+
+
+
+
+from .models import Approval
+
+class ApprovalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Approval
+        fields = ['id', 'approval_truck', 'link', 'status']

@@ -180,7 +180,9 @@ class CreateApprovalAPIView(APIView):
         
     def get(self, request, *args, **kwargs):
         try:
-            truck_id = request.query_params.get('truck_id')
+            print("Query Params:", request.query_params) 
+            truck_id = request.GET.get('truck_id[truckId]', None) 
+            print("!@#$%^&(*&^%$#@!$%^)", truck_id)
 
             if not truck_id:
                 return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -190,9 +192,16 @@ class CreateApprovalAPIView(APIView):
             approval = Approval.objects.filter(approval_truck=truck).first()
             if approval:
                 serializer = ApprovalSerializer(approval)
+                if approval.status == "pending":
+                    return Response({'status': "Pending approval request"}, status=status.HTTP_200_OK)
+                elif approval.status == "approved":
+                    return Response({'status': "Approved"}, status=status.HTTP_200_OK)
+                elif approval.status == "rejected":
+                    return Response({'status': "Rejected"}, status=status.HTTP_200_OK)
+
                 return Response({'status': approval.status}, status=status.HTTP_200_OK)
             else:
-                return Response({'status': 'No approval found for this truck'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'status': 'No approval request found for this truck'}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
