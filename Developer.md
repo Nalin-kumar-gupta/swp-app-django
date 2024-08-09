@@ -103,6 +103,10 @@ docker-compose -f local.yml run web python manage.py createsuperuser
 ## create data
 docker-compose -f local.yml run web python manage.py populate_inventory
 
+## flush database -> populate inventory -> create super user
+docker-compose -f local.yml run web python manage.py reset_inventory
+
+
 ## Package Viewset
 List Packages: GET /api/packages/
 Retrieve a Package: GET /api/packages/{id}/
