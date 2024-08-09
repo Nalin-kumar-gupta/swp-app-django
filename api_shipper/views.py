@@ -141,3 +141,58 @@ class VisualizePackagesView(APIView):
         
         except Exception as e:
             return JsonResponse({'error': f'An error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import Approval, Truck
+from .serializers import ApprovalSerializer
+import json
+
+class CreateApprovalAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            truck_id = data.get('truck_id')
+
+            if not truck_id:
+                return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            truck = get_object_or_404(Truck, id=truck_id)
+
+            existing_approval = Approval.objects.filter(approval_truck=truck).first()
+            if existing_approval:
+                return Response({'message': 'Approval already exists for this truck'}, status=status.HTTP_200_OK)
+
+            new_approval = Approval(approval_truck=truck)
+            new_approval.save()
+
+            serializer = ApprovalSerializer(new_approval)
+            return Response({'message': 'Approval created successfully', 'approval': serializer.data}, status=status.HTTP_201_CREATED)
+
+        except json.JSONDecodeError:
+            return Response({'error': 'Invalid JSON'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def get(self, request, *args, **kwargs):
+        try:
+            truck_id = request.query_params.get('truck_id')
+
+            if not truck_id:
+                return Response({'error': 'Truck ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+            truck = get_object_or_404(Truck, id=truck_id)
+
+            approval = Approval.objects.filter(approval_truck=truck).first()
+            if approval:
+                serializer = ApprovalSerializer(approval)
+                return Response({'status': approval.status}, status=status.HTTP_200_OK)
+            else:
+                return Response({'status': 'No approval found for this truck'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
