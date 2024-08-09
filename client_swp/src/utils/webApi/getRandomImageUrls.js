@@ -1,30 +1,13 @@
-const getRandomImageUrls = (numberOfImages, width, height) => {
-    const imageIds = [
-      '10', '11', '49', '61', '74', 
-      '76', '122', '142', '164'
-    ];
+import * as React from "react";
 
+const RandomImage = ({ ...props }) => {
+  const imageUrls = [
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpc1YZzr3vRd0mjk1eJ4z_44CdAj6yGPGLYA&s", // Replace with your actual image URLs
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlLg_CU5d_XiA6JEC1XjKDY8qYRZHZtbI7292-uSQc5ocy4olCo9qu6vQ1PDOWYl_Mby4&usqp=CAU",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90_cUgTLDY4sp9AqWPH3r_tA-yhPo1hP-HA&s",
+  ];
+  const randomImageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)];
+  return <img src={randomImageUrl} {...props} alt="Random truck" />;
+};
 
-  
-    // Shuffle the array of image IDs
-    const shuffledIds = shuffleArray(imageIds);
-  
-    // Select the first 'numberOfImages' from the shuffled array
-    const selectedIds = shuffledIds.slice(0, numberOfImages);
-  
-    // Generate image URLs using the selected IDs
-    const imageUrls = selectedIds.map(id => `https://picsum.photos/${width}/${height}?image=${id}`);
-  
-    return imageUrls;
-  };
-  
-  const shuffleArray = (array) => {
-    // Fisher-Yates shuffle algorithm
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  };
-  
-  export default getRandomImageUrls;
+export default RandomImage;

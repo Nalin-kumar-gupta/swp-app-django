@@ -8,12 +8,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(({ theme, status }) => ({
   [`&.${tableCellClasses.head}`]: {
     fontWeight: "bold",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    backgroundColor: status === "allocated" ? "#66CC00" : "inherit",
+    color: status === "allocated" ? "white" : "inherit",
   },
 }));
 
@@ -21,7 +23,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -51,15 +52,11 @@ export default function CustomizedTables(props) {
               <StyledTableCell align="center">{row.breadth}</StyledTableCell>
               <StyledTableCell align="center">{row.height}</StyledTableCell>
               <StyledTableCell align="center">{row.weight}</StyledTableCell>
-              <StyledTableCell align="center">
-                {row.destination}
-              </StyledTableCell>
-              <StyledTableCell align="center">
+              <StyledTableCell align="center">{row.destination}</StyledTableCell>
+              <StyledTableCell align="center" status={row.status}>
                 {row.status}
               </StyledTableCell>
-              <StyledTableCell align="center">
-                {row.deliver_date}
-              </StyledTableCell>
+              <StyledTableCell align="center">{row.deliver_date}</StyledTableCell>
               <StyledTableCell align="center">
                 {row.allocation}
               </StyledTableCell>

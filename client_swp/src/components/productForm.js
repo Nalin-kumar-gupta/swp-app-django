@@ -46,7 +46,7 @@ const ProductForm = (props) => {
     <div style={{ margin: "10px" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Product
+          Package
         </Typography>
         <Button
           disabled={productData.length == 0}
@@ -65,8 +65,11 @@ const ProductForm = (props) => {
           color: "grey",
         }}
       >
-        Add Product Details
+        Add Package Details
       </Divider>
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <img src="https://static.vecteezy.com/system/resources/thumbnails/000/356/093/small/2__2832_29.jpg" alt="Example" style={{ width: "150px", height: "150px" }} />
+      </div>
       <form onSubmit={addProductData} style={{ marginTop: "10px" }}>
         <TextField
           label="Length"
@@ -143,7 +146,7 @@ const ProductForm = (props) => {
           variant="outlined"
           type="submit"
         >
-          Add Product
+          Add Package
         </Button>
       </form>
     </div>

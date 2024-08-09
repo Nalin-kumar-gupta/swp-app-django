@@ -159,14 +159,12 @@ def pack_truck(truck, boxes):
                 truck.remove_box(best_box, x, y, z)
 
 
-
 def plotly_draw_boxes(truck, occupied_boxes):
     fig = go.Figure()
 
     axle_colors = ['blue', 'green', 'red', 'cyan']
-    highlighted_box_id = None
-
-    # Plot boxes
+    
+    # Plot boxes and their edges
     for idx, (box, x, y, z) in enumerate(occupied_boxes):
         axle_index = int(x / (truck.length / len(truck.axle_weight_ratings)))
         color = axle_colors[axle_index % len(axle_colors)]
@@ -196,6 +194,7 @@ def plotly_draw_boxes(truck, occupied_boxes):
             j.append(face[2])
             k.append(face[3])
 
+        # Add the mesh for the box
         fig.add_trace(go.Mesh3d(
             x=vertices['x'],
             y=vertices['y'],
@@ -206,6 +205,20 @@ def plotly_draw_boxes(truck, occupied_boxes):
             opacity=0.5,
             color=color,
             name=box.box_id
+        ))
+
+        # Add edges for the box
+        edges_x = [vertices['x'][i] for i in [0, 1, 2, 3, 0, 4, 5, 6, 7, 4, 5, 1, 2, 6, 7, 3]]
+        edges_y = [vertices['y'][i] for i in [0, 1, 2, 3, 0, 4, 5, 6, 7, 4, 5, 1, 2, 6, 7, 3]]
+        edges_z = [vertices['z'][i] for i in [0, 1, 2, 3, 0, 4, 5, 6, 7, 4, 5, 1, 2, 6, 7, 3]]
+        
+        fig.add_trace(go.Scatter3d(
+            x=edges_x,
+            y=edges_y,
+            z=edges_z,
+            mode='lines',
+            line=dict(color='black', width=2),
+            name=f'Box {box.box_id} edges'
         ))
 
     # Plot axles

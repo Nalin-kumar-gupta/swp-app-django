@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import vehicleApi from "../utils/webApi/vehicleApi";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -12,6 +13,7 @@ import { Divider } from "@mui/material";
 import { TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import visualizeApi from "../utils/webApi/visualizeApi";
+import RandomImage from "../utils/webApi/getRandomImageUrls";
 
 const style = {
   position: "absolute",
@@ -27,6 +29,7 @@ const style = {
   pb: 2,
 };
 
+
 const Vehicle = (props) => {
   const { onClick, ...vehicle } = props;
   return (
@@ -34,6 +37,16 @@ const Vehicle = (props) => {
       onClick={() => onClick(vehicle)}
       sx={{ maxWidth: 345, border: "2px solid gray", margin: "10px" }}
     >
+      {/* <RandomImage
+        height="140"
+        style={{ width: "100%", objectFit: "cover" }}
+      /> */}
+      <CardMedia
+        component="img"
+        height="140"
+        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS90_cUgTLDY4sp9AqWPH3r_tA-yhPo1hP-HA&s"  // Replace this with the actual URL of your truck image
+        alt="Truck used for supply chain"
+      />
       <CardContent>
         <Typography gutterBottom component="div">
           {vehicle.model_name}
@@ -42,6 +55,7 @@ const Vehicle = (props) => {
     </Card>
   );
 };
+
 
 const AddCard = (props) => {
   const { onClick } = props;
@@ -56,6 +70,12 @@ const AddCard = (props) => {
       }}
       onClick={onClick}
     >
+      <CardMedia
+        component="img"
+        height="140"
+        image="https://img.freepik.com/premium-vector/delivery-truck-icon-isometric-vector-fast-van-service-express-vehicle_96318-68152.jpg"  // Replace this with the actual URL of your truck image
+        alt="Truck used for supply chain"
+      />
       <CardContent>
         <Typography gutterBottom component="div">
           Add Vehicle
